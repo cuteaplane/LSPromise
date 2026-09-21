@@ -30,9 +30,18 @@ jobs:
         with:
           packages: 'platform-tools'
 
+      - name: Update SDK command-line tools
+        run: sdkmanager "cmdline-tools;latest"
+
+      - name: List available SDK packages
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --list --channel=3
+
       - name: Install build dependencies
         run: |
-          sdkmanager \
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --channel=3 \
             "platforms;android-37" \
             "build-tools;36.0.0" \
             "ndk;28.2.13676358" \
