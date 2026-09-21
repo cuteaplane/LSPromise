@@ -1,0 +1,38 @@
+name: Build APK
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install build dependencies
+        run: sdkmanager "platforms;android-37" "build-tools;36.0.0" "ndk;28.2.13676358" "cmake;3.22.1"
+
+      - name: Build APK
+        run: bash ./gradlew --no-daemon --stacktrace :app:assembleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LSPromise-arm64-release
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 14
